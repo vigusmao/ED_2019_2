@@ -71,22 +71,46 @@ public class ArvoreBinaria {
         int valor = Integer.valueOf(
             arvoreAsString.substring(0, posFinalRaiz));
 
-        // crio a raiz da árvore
-        arvore.adicionarNo(valor, null, false);
+        // cria e empilha a raiz da árvore
+        NoArvoreBinaria raiz = arvore.adicionarNo(valor, null, false);
+        pilha.push(raiz);
 
         int pos = posFinalRaiz;
+        boolean bypassarFilhoEsquerdo = false;
+
         while (pos < tamanhoString) {
-            // ToDo Descubro a posição do próximo parêntese
-            // ToDo Se é maior que a posição corrente, leio o número até lá
-            //      (e trato esse número, criando um nó e empilhando)
-            // Caso a posição corrente seja um abre-parêntese, não faz nada
-            // Caso a posição corrente seja um fecha-parêntese,
-            //       ... se a posição anterior for abre-parêntese, cria um filho esq nulo
-            //       ... senão desempilha
+            int posProximoAbreParentese = arvoreAsString.indexOf('(', pos);
+            if (pos == posProximoAbreParentese) {
+                pos++;     // apenas avance;
+                continue;  // nada precisa ser feito diante de um '('
+            }
+            int posProximoFechaParentese = arvoreAsString.indexOf(')', pos);
+            if (pos == posProximoFechaParentese) {
+                if (arvoreAsString.charAt(pos - 1) == '(') {
+                    bypassarFilhoEsquerdo = true;  // indica que o próximo filho será direito
+                } else {
+                    pilha.pop();
+                }
+                pos++;
+                continue;
+            }
+
+            int posFimProximoValor = Math.min(
+                    posProximoAbreParentese == -1 ? tamanhoString : posProximoAbreParentese,
+                    posProximoFechaParentese == -1 ? tamanhoString : posProximoFechaParentese);
+
+            int proximoValor = Integer.parseInt(
+                    arvoreAsString.substring(pos, posFimProximoValor));
+
+            NoArvoreBinaria noPai = pilha.peek();
+            NoArvoreBinaria novoNo = arvore.adicionarNo(proximoValor, noPai,
+                    !bypassarFilhoEsquerdo && noPai.getEsq() == null);
+            pilha.push(novoNo);
+
+            bypassarFilhoEsquerdo = false;  // reseta o flag
+            pos = posFimProximoValor;  // avança o cursor para depois do fim do valor lido
         }
 
-
-
+        return arvore;
     }
-
 }

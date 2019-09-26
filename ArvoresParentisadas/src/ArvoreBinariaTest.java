@@ -23,7 +23,7 @@ public class ArvoreBinariaTest {
 
     @Test
     public void testeIdaEVolta() {
-        String arvoreAsString = "10(5(20))(4)";
+        String arvoreAsString = "10(5(20))(4(1)(2()(8(7))))";
         ArvoreBinaria arvore = ArvoreBinaria.fromString(arvoreAsString);
         assertEquals(arvoreAsString, arvore.toString());
     }
